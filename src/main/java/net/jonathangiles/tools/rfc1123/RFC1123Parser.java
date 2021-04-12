@@ -18,28 +18,20 @@ public class RFC1123Parser {
             parseInt(date.substring(17, 19)),  // hour
             parseInt(date.substring(20, 22)),  // minute
             parseInt(date.substring(23, 25)),  // second
-            0,                    // nanoOfSecond
+            0,                                 // nanoOfSecond
             ZoneOffset.UTC);
     }
 
     private static int parseInt(final String s) {
-        // Check for a sign.
-        int num  = 0;
-        int sign = -1;
         final int len  = s.length();
-        final char ch  = s.charAt(0);
-        if (ch == '-') {
-            sign = 1;
-        } else {
-            num = '0' - ch;
-        }
 
-        int i = 1;
-        while ( i < len ) {
+        int num = 0;
+        int i = 0;
+        while (i < len) {
             num = num * 10 + '0' - s.charAt(i++);
         }
 
-        return sign * num;
+        return -1 * num;
     }
 
     private static int parseMonth(final String month) {
