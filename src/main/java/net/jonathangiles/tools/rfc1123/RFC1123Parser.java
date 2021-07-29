@@ -1,5 +1,6 @@
 package net.jonathangiles.tools.rfc1123;
 
+import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
@@ -25,7 +26,11 @@ public class RFC1123Parser {
     private static int parseInt(final CharSequence date, final int start, final int end) {
         int num = 0;
         for (int i = start; i < end; i++) {
-            num = num * 10 + (date.charAt(i) - '0');
+            final char c = date.charAt(i);
+            if (c < '0' || c > '9') {
+                throw new DateTimeException("Invalid date time: " + date);
+            }
+            num = num * 10 + (c - '0');
         }
 
         return num;
