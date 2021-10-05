@@ -9,11 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.function.Function;
 
-public class RFC1123TestApp {
-    // for testing purposes only
+public class RFC1123StringTestApp {
+    // approach one on creating rfc1123 strings:
     private static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER =
         DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'").withZone(ZoneId.of("UTC")).withLocale(Locale.US);
+    private static final Function<OffsetDateTime, String> RFC1123_DATE_TIME_FORMATTER_APPROACH_1 =
+        RFC1123_DATE_TIME_FORMATTER::format;
+
+    // approach two on creating rfc1123 strings:
+    private static final Function<OffsetDateTime, String> RFC1123_DATE_TIME_FORMATTER_APPROACH_2 =
+        DateTimeFormatter.RFC_1123_DATE_TIME::format;
+
+    // approach three on creating rfc1123 strings:
+    private static final Function<OffsetDateTime, String> RFC1123_DATE_TIME_FORMATTER_APPROACH_3 =
+        RFC1123String::toString;
 
     private static final boolean DO_EQUALITY_CHECK = true;
 
@@ -23,31 +34,31 @@ public class RFC1123TestApp {
     private static final List<String> GENERATED_DATES = new ArrayList<>();
     private static final int COUNTDOWN = 100000;
 
+    // Expected output: 'Tue, 05 Oct 2021 01:02:37 GMT'
     public static void main(String[] args) {
         final Random r = new Random();
-        final RFC1123Parser rfc1123Parser = new RFC1123Parser();
 
         Instant instant = Instant.EPOCH;
         int count = COUNTDOWN;
         while (true) {
             OffsetDateTime date = OffsetDateTime.ofInstant(instant, ZoneOffset.UTC);
-            String dateString = RFC1123_DATE_TIME_FORMATTER.format(date);
+
+            String dateString = RFC1123_DATE_TIME_FORMATTER_APPROACH_3.apply(date);
 
             if (DO_EQUALITY_CHECK) {
-                OffsetDateTime d1 = OffsetDateTime.parse(dateString, DateTimeFormatter.RFC_1123_DATE_TIME);
-                OffsetDateTime d2 = rfc1123Parser.parse(dateString);
-                if (!d1.equals(d2)) {
+                String jdkDateString1 = RFC1123_DATE_TIME_FORMATTER_APPROACH_1.apply(date);
+                if (!dateString.equals(jdkDateString1)) {
                     System.out.print("FAIL ");
-                    System.out.print(d1);
-                    System.out.print(" == ");
-                    System.out.println(d2);
+                    System.out.print(dateString);
+                    System.out.print(" != ");
+                    System.out.println(jdkDateString1);
                     System.exit(-1);
                 }
             }
 
             if (count-- == 0) {
                 // we print occasionally just to show a heartbeat
-                System.out.println(date);
+                System.out.println(dateString);
                 count = COUNTDOWN;
                 if (COLLECT_DATES) {
                     GENERATED_DATES.add(dateString);

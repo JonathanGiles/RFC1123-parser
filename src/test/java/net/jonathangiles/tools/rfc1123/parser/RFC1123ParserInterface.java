@@ -1,4 +1,4 @@
-package net.jonathangiles.tools.rfc1123;
+package net.jonathangiles.tools.rfc1123.parser;
 
 import java.time.OffsetDateTime;
 

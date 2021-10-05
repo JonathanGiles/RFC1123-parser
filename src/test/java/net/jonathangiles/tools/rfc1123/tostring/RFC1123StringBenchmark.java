@@ -1,4 +1,4 @@
-package net.jonathangiles.tools.rfc1123;
+package net.jonathangiles.tools.rfc1123.tostring;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -10,16 +10,10 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
-public class RFC1123ParserBenchmark {
-    // for testing purposes only
-    private static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER =
-        DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'").withZone(ZoneId.of("UTC")).withLocale(Locale.US);
-
+public class RFC1123StringBenchmark {
     public static void main(String[] args) throws IOException {
         org.openjdk.jmh.Main.main(args);
     }
@@ -30,9 +24,9 @@ public class RFC1123ParserBenchmark {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Measurement(iterations = 1, time = 10, timeUnit = TimeUnit.SECONDS)
     @Warmup(iterations = 1, time = 5)
-    public void newParserTest(ExecutionPlan plan, Blackhole blackhole) {
-        for (final String dateString : plan.datesToParse) {
-            blackhole.consume(plan.newParser.parse(dateString));
+    public void customToStringTest(ExecutionPlan plan, Blackhole blackhole) {
+        for (final OffsetDateTime datetime : plan.dates) {
+            blackhole.consume(plan.customToString.toString(datetime));
         }
     }
 
@@ -42,9 +36,21 @@ public class RFC1123ParserBenchmark {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Measurement(iterations = 1, time = 10, timeUnit = TimeUnit.SECONDS)
     @Warmup(iterations = 1, time = 5)
-    public void oldParserTest(ExecutionPlan plan, Blackhole blackhole) {
-        for (final String dateString : plan.datesToParse) {
-            blackhole.consume(plan.oldParser.parse(dateString));
+    public void jdkToString1Test(ExecutionPlan plan, Blackhole blackhole) {
+        for (final OffsetDateTime datetime : plan.dates) {
+            blackhole.consume(plan.jdkToString1.toString(datetime));
+        }
+    }
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @Fork(value = 1, warmups = 1)
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    @Measurement(iterations = 1, time = 10, timeUnit = TimeUnit.SECONDS)
+    @Warmup(iterations = 1, time = 5)
+    public void jdkToString2Test(ExecutionPlan plan, Blackhole blackhole) {
+        for (final OffsetDateTime datetime : plan.dates) {
+            blackhole.consume(plan.jdkToString2.toString(datetime));
         }
     }
 }

@@ -1,5 +1,6 @@
-package net.jonathangiles.tools.rfc1123;
+package net.jonathangiles.tools.rfc1123.parser;
 
+import net.jonathangiles.tools.rfc1123.RFC1123Parser;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
